@@ -71,7 +71,6 @@ invention-patent-oa-assistant/
 ├── scripts/                              # 全部纯 Python 标准库实现，零第三方依赖
 │   ├── generate_docx.py                  # docx 生成脚本（含必备要素自动校验）
 │   ├── check_materials.py                # 机检：材料完备性（Step 1 硬性门槛）
-│   ├── check_deadline.py                 # 机检：答复期限计算（含节假日顺延）
 │   ├── check_citations.py                # 机检：逐字引用比对（Step 4 引用铁律）
 │   ├── check_argument_lengths.py         # 机检：特征论证字数区间（Step 7 提示级）
 │   ├── check_claim_links.py              # 机检：权利要求引用链条闭合（Step 8）
@@ -81,7 +80,7 @@ invention-patent-oa-assistant/
 │   ├── check_ai_traces.py                # 机检：AI 痕迹扫描（style-rules）
 │   ├── check_clean_markers.py            # 机检：正文零标记残留（最高优先级纪律）
 │   ├── check_deliverables.py             # 机检：交付物完整性（3 docx + 1 md）
-│   └── run_regression_tests.py           # 回归测试集（38 组正反用例，修改后运行验证）
+│   └── run_regression_tests.py           # 回归测试集（35 组正反用例，修改后运行验证）
 └── references/
     ├── rejection-quick-reference.md      # 常规条款扫描速查表（11 类驳回条款 + 未覆盖条款说明）
     ├── input-checklist.md                # 输入解析清单 + 程序性要素识别 + 材料缺口处理
@@ -103,8 +102,8 @@ invention-patent-oa-assistant/
 | 真实性 | 不编造对比文件内容/段落号/法条原文/实施例数据 |
 | 零标记 | 正文不含「待核实/待补」等标记，统一登记附件清单 |
 | 条号 | 专利法 2020 / 实施细则 2023 / 审查指南 2023（现行版） |
-| 机检工具 | 11 个纯标准库检查脚本（材料/期限/引用/字数/链条/条号/自足性/术语/AI痕迹/零标记/交付物），统一退出码约定（0 通过 / 1 不通过 / 2 用法错误） |
-| 回归测试 | `run_regression_tests.py` 内置 38 组正反用例，修改本 skill 后运行确认行为未退化 |
+| 机检工具 | 10 个纯标准库检查脚本（材料/引用/字数/链条/条号/自足性/术语/AI痕迹/零标记/交付物），统一退出码约定（0 通过 / 1 不通过 / 2 用法错误） |
+| 回归测试 | `run_regression_tests.py` 内置 35 组正反用例，修改本 skill 后运行确认行为未退化 |
 | docx 生成 | 脚本纯 Python 标准库实现，零第三方依赖（可选使用） |
 
 ## 八、免责声明
@@ -112,7 +111,6 @@ invention-patent-oa-assistant/
 - **数据隐私**：所有处理（含全部机检脚本）均在你本地完成，**不联网、不上传、不收集**任何输入材料与生成内容——你的专利申请文件不会离开你的设备。
 - 本技能输出为**分析辅助与初稿**，不构成法律意见；实际使用前须由执业代理人复核技术事实、法条引用、修改文本与答复策略。
 - 法条以现行有效版本为准（专利法 2020 修正、实施细则 2023 修订、审查指南 2023）；引用前请核取官方文本。法条/细则修订后，内置条号映射表需同步更新。
-- `check_deadline.py` 内置 2026 年法定节假日；其他年份周六/周日自动顺延，法定节假日请以国务院/国知局公告为准，用 `--holidays` 参数增补。
 - 本技能仅适用于中国发明专利申请的审查阶段答复，不适用于实用新型、复审、无效宣告、PCT 国际阶段等程序。
 
 ## 九、许可（License）

@@ -291,10 +291,6 @@ def main():
             # ---- check_deliverables.py ----
             ('deliverables_pass_okdir', ('check_deliverables.py', '--dir', str(d['okdir'])), 0, 'PASS'),
             ('deliverables_fail_baddir', ('check_deliverables.py', '--dir', str(d['baddir'])), 1, 'FAIL'),
-            # ---- check_deadline.py ----
-            ('deadline_basic_4m', ('check_deadline.py', '--issue', '2026-06-01', '--months', '4'), 0, '2026-10-16'),
-            ('deadline_weekend_roll', ('check_deadline.py', '--received', '2026-06-06', '--months', '0'), 0, '2026-06-08'),
-            ('deadline_holiday_roll', ('check_deadline.py', '--received', '2026-10-01', '--months', '0'), 0, '2026-10-05'),
             # ---- check_law_citations.py ----
             ('law_citations_ok', ('check_law_citations.py', '--input', str(d['law_ok'])), 0, 'PASS'),
             ('law_citations_warn_hint', ('check_law_citations.py', '--input', str(d['law_warn'])), 0, '未收录'),
