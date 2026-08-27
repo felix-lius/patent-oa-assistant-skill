@@ -282,7 +282,7 @@ def main():
             ('materials_pass_no_drawings', ('check_materials.py', '--round', '1',
              '--present', 'oa,claims,spec,contrast', '--no-drawings'), 0, 'PASS'),
             ('materials_scale_output', ('check_materials.py', '--round', '1',
-             '--present', 'oa,claims,spec,drawings,contrast', '--files', str(d['scale_small'])), 0, '建议 不中断模式'),
+             '--present', 'oa,claims,spec,drawings,contrast', '--files', str(d['scale_small'])), 0, '建议 默认模式'),
             # ---- check_clean_markers.py ----
             ('markers_pass_clean', ('check_clean_markers.py', '--input', str(d['good'])), 0, 'PASS'),
             ('markers_fail_bad', ('check_clean_markers.py', '--input', str(d['bad'])), 1, 'FAIL'),

@@ -78,7 +78,7 @@ def main():
         est_tokens = int(total_chars * 0.8)
         scale = {
             'total_chars': total_chars, 'est_tokens': est_tokens,
-            'mode': '分步模式' if total_chars > 30000 else '不中断模式',
+            'mode': '分步模式' if total_chars > 30000 else '默认模式',
             'files': file_details, 'missing_files': missing_files,
         }
 
