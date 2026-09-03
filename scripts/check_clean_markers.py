@@ -40,25 +40,17 @@ PATTERNS = [
 ]
 
 
-EXEMPT_CATS_BY_PREFIX = {
-    # 正文外附件（《附件·答复辅助材料汇总》）本身专门收纳待核实信息，
-    # "待核实/待补"等字样出现在其中是合法内容，不构成残留。
-    '附件_': {'待核实类标记', '待核实类标记(自定义)'},
-}
-
-
-def exempt_cats_for(name):
-    for prefix, cats in EXEMPT_CATS_BY_PREFIX.items():
-        if name.startswith(prefix):
-            return cats
-    return set()
+# 豁免规则集中定义于 scripts/_exempt.py（与 check_ai_traces 共享，避免规则碎片化）。
+# 本脚本**有意不采用** _exempt.apply_block_exempt（区块豁免）：占位符与执行指令
+# 无论出现在哪个区块都不应出现在交付物中；若模板写法被判残留，应改模板而非放宽检查。
+from _exempt import exempt_cats_for, is_cat_exempt
 
 
 def scan_text(text, label, exempt_cats=()):
     hits = []
     for lineno, line in enumerate(text.split('\n'), 1):
         for cat, pat in PATTERNS:
-            if cat in exempt_cats:
+            if is_cat_exempt(cat, exempt_cats):
                 continue
             for m in pat.finditer(line):
                 hits.append({'file': label, 'line': lineno, 'cat': cat,
@@ -75,7 +67,7 @@ def scan_docx(path, exempt_cats=()):
         if not text:
             continue
         for cat, pat in PATTERNS:
-            if cat in exempt_cats:
+            if is_cat_exempt(cat, exempt_cats):
                 continue
             for m in pat.finditer(text):
                 hits.append({'file': str(path), 'line': idx, 'cat': cat,

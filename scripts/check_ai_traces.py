@@ -11,8 +11,13 @@ AI 痕迹扫描（对应 SKILL.md Step 9"无 AI 痕迹"与 Step 10 机检项，�
   4. 禁止的格式痕迹：→ 链式箭头、行首分点符号（• / -）
   5. 半角标点：中文语境中的英文逗号/句号/分号/冒号（附图标记数字与英文缩写豁免）
 
-说明：扫描器命中后由 AI 判断改写（如"首先"在个别语境可合法使用）；
-正文外附件（前缀"附件_"）豁免全部检查。
+说明：扫描器命中后由 AI 判断改写（如"首先"在个别语境可合法使用）。
+
+豁免范围（命中即不扫描）：
+  1. 正文外附件（文件名前缀"附件_"）—— 提交时删除，非递交文本；
+  2. "提交时删除"区块 —— 文中以该标记起始的答复策略说明、策略选择页等，直至下一个 --- 或一级标题；
+  3. 模板强制措辞整行 —— opinion-letter-template 要求"逐字采用、不得省略或改写"的
+     敬语开头段与结论收尾段。此类措辞本身即合规，不得因扫描规则而要求改写。
 
 用法：
   python check_ai_traces.py --input 初稿.md
@@ -37,22 +42,23 @@ PATTERNS = [
     ('框架术语泄漏', re.compile(r'四维比对|结合启示阻断|目的性驱动缺失|物理逻辑冲突检验|教导缺失|防割裂|反向推演|核心构思统领|一形两用|移用技术障碍|答复前景|创造性贡献度|打分|权重')),
     ('格式痕迹-箭头', re.compile(r'→')),
     ('格式痕迹-分点', re.compile(r'^\s*[•\-]\s+', re.M)),
-    ('半角标点', re.compile(r'[\u4e00-\u9fff][,.;:!?]|[,.;:!?][\u4e00-\u9fff]')),
+    # 半角标点：中文语境中的英文逗号/句号/分号/冒号（附图标记数字与英文缩写豁免）。
+    # 另豁免"数字 + 半角点"的编号格式（如权利要求编号"1.一种……"），该点属编号符号而非标点。
+    ('半角标点', re.compile(r'[\u4e00-\u9fff][,;:!?]|[\u4e00-\u9fff]\.(?![0-9])|[,;:!?][\u4e00-\u9fff]|(?<![0-9])\.[\u4e00-\u9fff]')),
 ]
 
-# 正文外附件（内部辅助材料，提交时删除）豁免全部 AI 痕迹检查
-EXEMPT_PREFIX = '附件_'
-
-
-def exempted(name):
-    return name.startswith(EXEMPT_PREFIX)
+# 豁免规则集中定义于 scripts/_exempt.py（与 check_clean_markers 共享，避免规则碎片化）。
+# 本脚本采用其中的"提交时删除"区块豁免与模板强制措辞整行豁免：答复策略说明、
+# 策略选择页属正文外内容，其口语化与说明性表述不按递交正文的文风标准评判。
+from _exempt import apply_block_exempt, is_attachment
 
 
 def scan_text(text, label):
-    if exempted(label):
+    if is_attachment(label):
         return []
     hits = []
-    for lineno, line in enumerate(text.split('\n'), 1):
+    units = list(enumerate(text.split('\n'), 1))
+    for lineno, line in apply_block_exempt(units):
         for cat, pat in PATTERNS:
             for m in pat.finditer(line):
                 hits.append({'file': label, 'line': lineno, 'cat': cat,
@@ -61,13 +67,14 @@ def scan_text(text, label):
 
 
 def scan_docx(path):
-    if exempted(path.name):
+    if is_attachment(path.name):
         return []
     with zipfile.ZipFile(path) as zf:
         xml = zf.read('word/document.xml').decode('utf-8')
     hits = []
-    for idx, para in enumerate(xml.split('</w:p>'), 1):
-        text = re.sub(r'<[^>]+>', '', para).strip()
+    units = [(idx, re.sub(r'<[^>]+>', '', para).strip())
+             for idx, para in enumerate(xml.split('</w:p>'), 1)]
+    for idx, text in apply_block_exempt(units):
         if not text:
             continue
         for cat, pat in PATTERNS:

@@ -43,6 +43,8 @@ MARKER_CLEAN = [
     re.compile(r'D\d+'),             # D1 D2
     re.compile(r'CN\s*\d+'),         # CN 公开号
     re.compile(r'^\s*\d+[.、)]\s*', re.M),  # 行首编号 1. 2、
+    re.compile(r'\d{4}\s*年\s*\d{1,2}\s*月\s*\d{1,2}\s*日'),  # 日期 2025年03月28日
+    re.compile(r'\d{4}[-/]\d{1,2}[-/]\d{1,2}'),                # 日期 2025-03-28 / 2025/03/28
 ]
 MARKER_RE = re.compile(r'(?<!\d)\d{1,3}(?!\d)')
 
